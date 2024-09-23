@@ -185,11 +185,6 @@ func getVideoList(startdate string, enddate string) []Video {
 		15, // maxresult int64
 	)
 	
-	//fmt.Println(response)
-	//fmt.Printf("%T\n", response)
-	//response_json, _ := json.MarshalIndent(response,"","    ")
-	//fmt.Println(string(response_json))
-
 	var video Video
 	var video_list []Video
 
@@ -203,9 +198,8 @@ func getVideoList(startdate string, enddate string) []Video {
 	return reverseVideoList(video_list)
 }
 
-func updateVideoCount(video Video) {
+func updateVideoCount(video *Video) {
 	enddate_today := time.Now().Format("2006-01-02")
-	//fmt.Println(enddate_today)
 	filter_query := fmt.Sprintf("video==%s", video.Video_id)
 	
 	response := callYTAnalyticsAPI(
@@ -217,44 +211,105 @@ func updateVideoCount(video Video) {
 		"", // sort
 		5, // maxresult
 	)
-
 	video.View_counts = response.Rows[0][1].(float64)
 	video.Like_counts = response.Rows[0][2].(float64)
 	video.Dislike_counts = response.Rows[0][3].(float64)
+}
 
-	//filter_query := fmt.Sprintf("video==%s;insightTrafficSourceType==EXT_URL", video.Video_id)
-	//response := callYTAnalyticsAPI(
-	//	"insightTrafficSourceDetail", // dimentions
-	//	"estimatedMinutesWatched,views", // metrics
-	//	filter_query, // filters
-	//	"2024-09-10", // startdate
-	//	"2024-09-20", // enddate
-	//	"-estimatedMinutesWatched", // sort
-	//	10, // maxresult
+func updateVideoTrafficSourceType(video *Video) {
+	enddate_today := time.Now().Format("2006-01-02")
+	filter_query := fmt.Sprintf("video==%s", video.Video_id)
+
+	response := callYTAnalyticsAPI(
+		"insightTrafficSourceType", // dimentions
+		"views,estimatedMinutesWatched", // metrics
+		filter_query, // filters
+		STARTDATE_SHOWINT, // startdate
+		enddate_today, // enddate
+		"-views", // sort
+		10, // maxresult
+	)
+	//response := callYTAnalytics(
+	//  channel_id: "channel==MINE",
+	//	dimentions: "insightTrafficSourceDetail",
+	//	metrics: "estimatedMinutesWatched,views",
+	//	filters: "video==ePJIVZZhzRg;insightTrafficSourceType==EXT_URL",
+	//	startdate: "2024-09-10",
+	//	enddate: "2024-09-20",
+	//	sort: "-estimatedMinutesWatched",
+	//	maxresult: 10,
 	//)
-	
-	//fmt.Println(response)
-	//fmt.Printf("%T\n", response)
-	//fmt.Println(response.Rows)
-	fmt.Println(video)
-	fmt.Println(response.Rows[0][1].(float64))
-	fmt.Println(video.View_counts)
-	fmt.Printf("%T\n", response.Rows[0][1])
-	//m, _ := json.MarshalIndent(response,"","    ")
-	//fmt.Println(string(m))
+	//
+
+	fmt.Println(response)
+	m, _ := json.MarshalIndent(response,"","    ")
+	fmt.Println(string(m))
+
+	//return response
+
+	// TODOs
+	//データの取得は成功。
+	// あとは以下フォーマットに合わせて、Video構造体を拡張するかを考える。TODO: 配列の個数が定義しきれない場合は構造体はどう定義する？
+	//"rows": [
+    //    [
+    //        "SUBSCRIBER",
+    //        437,
+    //        2039
+    //    ],
+    //    [
+    //        "RELATED_VIDEO",
+    //        25,
+    //        111
+    //    ],
+    //    [
+    //        "EXT_URL",
+    //        22,
+    //        132
+    //    ],
+    //    [
+    //        "NO_LINK_OTHER",
+    //        20,
+    //        86
+    //    ],
+    //    [
+    //        "YT_CHANNEL",
+    //        17,
+    //        109
+    //    ],
+    //    [
+    //        "YT_OTHER_PAGE",
+    //        15,
+    //        85
+    //    ],
+    //    [
+    //        "YT_SEARCH",
+    //        8,
+    //        46
+    //    ],
+    //    [
+    //        "NOTIFICATION",
+    //        8,
+    //        14
+    //    ],
+    //    [
+    //        "PLAYLIST",
+    //        6,
+    //        46
+    //    ]
+    //]
 
 }
 
-// func getVideoTrafficSource(video_id string) []VideoTrafficSrouce {
-func updateVideoTrafficSource(video Video) {
-
+func updateVideoTrafficSourceDetail(video *Video) {
+	enddate_today := time.Now().Format("2006-01-02")
 	filter_query := fmt.Sprintf("video==%s;insightTrafficSourceType==EXT_URL", video.Video_id)
+
 	response := callYTAnalyticsAPI(
 		"insightTrafficSourceDetail", // dimentions
 		"estimatedMinutesWatched,views", // metrics
 		filter_query, // filters
-		"2024-09-10", // startdate
-		"2024-09-20", // enddate
+		STARTDATE_SHOWINT, // startdate
+		enddate_today, // enddate
 		"-estimatedMinutesWatched", // sort
 		10, // maxresult
 	)
@@ -270,7 +325,7 @@ func updateVideoTrafficSource(video Video) {
 	//)
 	//
 
-	//fmt.Println(response)
+	fmt.Println(response)
 	m, _ := json.MarshalIndent(response,"","    ")
 	fmt.Println(string(m))
 
@@ -278,18 +333,17 @@ func updateVideoTrafficSource(video Video) {
 }
 
 func gatherVideoStats(startdate string, enddate string) []Video {
-	video_list := getVideoList(startdate, enddate)
+	var video_list_final []Video
 
-	//fmt.Println(video_list)
-	//fmt.Printf("%T\n", video_list)
+	video_list_init := getVideoList(startdate, enddate)
+	for _, video := range video_list_init {
+		updateVideoCount(&video)
+		updateVideoTrafficSourceType(&video)
 
-	for _, video := range video_list {
-		updateVideoCount(video)
-		fmt.Println(video.View_counts)
+		video_list_final = append(video_list_final, video)
 	}
 
-	fmt.Println(video_list)
-	return video_list
+	return video_list_final
 } 
 
 /*
