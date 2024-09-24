@@ -26,7 +26,7 @@ type ChannelStats struct {
 // These values are defined on sightTrafficSourceType API reference
 // insightTrafficSourceType
 // https://developers.google.com/youtube/analytics/dimensions#Traffic_Source_Dimensions
-type traffic_source_type struct {
+type Traffic_source_counts struct {
 	SUBSCRIBER		float64
 	RELATED_VIDEO	float64
 	EXT_URL 		float64
@@ -38,6 +38,22 @@ type traffic_source_type struct {
 	NOTIFICATION	float64
 }
 
+type Age_percentage struct {
+	age13_17	float64
+	age18_24	float64
+	age25_34	float64
+	age35_44 	float64
+	age45_54 	float64
+	age55_64	float64
+	age65_		float64
+}
+
+type Gender_percentage struct {
+	male			float64
+	female			float64
+	user_specified	float64
+}
+
 type Video struct {
 	Video_title    string
 	Video_id       string
@@ -46,7 +62,9 @@ type Video struct {
 	Like_counts    float64
 	Dislike_counts float64
 	thumbnail_url  string
-	traffic_source traffic_source_type
+	traffic_source Traffic_source_counts
+	age_percentage Age_percentage
+	gender_percentage Gender_percentage
 }
 
 const (
@@ -268,6 +286,69 @@ func updateVideoTrafficSourceType(video *Video) {
 	}
 }
 
+func updateAgePercentage(video *Video) {
+	enddate_today := time.Now().Format("2006-01-02")
+	filter_query := fmt.Sprintf("video==%s", video.Video_id)
+
+	response := callYTAnalyticsAPI(
+		"ageGroup", // dimentions
+		"viewerPercentage", // metrics
+		filter_query, // filters
+		STARTDATE_SHOWINT, // startdate
+		enddate_today, // enddate
+		"", // sort
+		10, // maxresult
+	)
+
+	for _, row := range response.Rows {
+		switch row[0] {
+		case "age13-17":
+			video.age_percentage.age13_17 = row[1].(float64)
+		case "age18-24":
+			video.age_percentage.age18_24 = row[1].(float64)
+		case "age25-34":
+			video.age_percentage.age25_34 = row[1].(float64)
+		case "age35-44":
+			video.age_percentage.age35_44 = row[1].(float64)
+		case "age45-54":
+			video.age_percentage.age45_54 = row[1].(float64)
+		case "age55-64":
+			video.age_percentage.age55_64 = row[1].(float64)
+		case "age65-":
+			video.age_percentage.age65_ = row[1].(float64)
+		}
+	}
+}
+
+func updateGenderPercentage(video *Video) {
+	enddate_today := time.Now().Format("2006-01-02")
+	filter_query := fmt.Sprintf("video==%s", video.Video_id)
+
+	response := callYTAnalyticsAPI(
+		"gender", // dimentions
+		"viewerPercentage", // metrics
+		filter_query, // filters
+		STARTDATE_SHOWINT, // startdate
+		enddate_today, // enddate
+		"", // sort
+		10, // maxresult
+	)
+
+	m, _ := json.MarshalIndent(response,"","    ")
+	fmt.Println(string(m))
+
+	for _, row := range response.Rows {
+		switch row[0] {
+		case "male":
+			video.gender_percentage.male = row[1].(float64)
+		case "female":
+			video.gender_percentage.female = row[1].(float64)
+		case "user_specified":
+			video.gender_percentage.user_specified = row[1].(float64)
+		}
+	}
+}
+
 func updateVideoTrafficSourceDetail(video *Video) {
 	enddate_today := time.Now().Format("2006-01-02")
 	filter_query := fmt.Sprintf("video==%s;insightTrafficSourceType==EXT_URL", video.Video_id)
@@ -281,6 +362,7 @@ func updateVideoTrafficSourceDetail(video *Video) {
 		"-estimatedMinutesWatched", // sort
 		10, // maxresult
 	)
+
 	//response := callYTAnalytics(
 	//  channel_id: "channel==MINE",
 	//	dimentions: "insightTrafficSourceDetail",
@@ -307,7 +389,8 @@ func gatherVideoStats(startdate string, enddate string) []Video {
 	for _, video := range video_list_init {
 		updateVideoCount(&video)
 		updateVideoTrafficSourceType(&video)
-
+		updateAgePercentage(&video)
+		updateGenderPercentage(&video)
 		video_list_final = append(video_list_final, video)
 	}
 
