@@ -23,6 +23,21 @@ type ChannelStats struct {
 	Channel_id    string
 }
 
+// These values are defined on sightTrafficSourceType API reference
+// insightTrafficSourceType
+// https://developers.google.com/youtube/analytics/dimensions#Traffic_Source_Dimensions
+type traffic_source_type struct {
+	SUBSCRIBER		float64
+	RELATED_VIDEO	float64
+	EXT_URL 		float64
+	NO_LINK_OTHER	float64
+	YT_CHANNEL		float64
+	YT_OTHER_PAGE	float64
+	YT_SEARCH		float64
+	PLAYLIST		float64
+	NOTIFICATION	float64
+}
+
 type Video struct {
 	Video_title    string
 	Video_id       string
@@ -31,9 +46,8 @@ type Video struct {
 	Like_counts    float64
 	Dislike_counts float64
 	thumbnail_url  string
+	traffic_source traffic_source_type
 }
-
-//type Response interface {}
 
 const (
 	CHANNEL_ID_QUERY =  "channel==MINE"
@@ -222,82 +236,36 @@ func updateVideoTrafficSourceType(video *Video) {
 
 	response := callYTAnalyticsAPI(
 		"insightTrafficSourceType", // dimentions
-		"views,estimatedMinutesWatched", // metrics
+		"views", // metrics
 		filter_query, // filters
 		STARTDATE_SHOWINT, // startdate
 		enddate_today, // enddate
 		"-views", // sort
-		10, // maxresult
+		15, // maxresult
 	)
-	//response := callYTAnalytics(
-	//  channel_id: "channel==MINE",
-	//	dimentions: "insightTrafficSourceDetail",
-	//	metrics: "estimatedMinutesWatched,views",
-	//	filters: "video==ePJIVZZhzRg;insightTrafficSourceType==EXT_URL",
-	//	startdate: "2024-09-10",
-	//	enddate: "2024-09-20",
-	//	sort: "-estimatedMinutesWatched",
-	//	maxresult: 10,
-	//)
-	//
 
-	fmt.Println(response)
-	m, _ := json.MarshalIndent(response,"","    ")
-	fmt.Println(string(m))
-
-	//return response
-
-	// TODOs
-	//データの取得は成功。
-	// あとは以下フォーマットに合わせて、Video構造体を拡張するかを考える。TODO: 配列の個数が定義しきれない場合は構造体はどう定義する？
-	//"rows": [
-    //    [
-    //        "SUBSCRIBER",
-    //        437,
-    //        2039
-    //    ],
-    //    [
-    //        "RELATED_VIDEO",
-    //        25,
-    //        111
-    //    ],
-    //    [
-    //        "EXT_URL",
-    //        22,
-    //        132
-    //    ],
-    //    [
-    //        "NO_LINK_OTHER",
-    //        20,
-    //        86
-    //    ],
-    //    [
-    //        "YT_CHANNEL",
-    //        17,
-    //        109
-    //    ],
-    //    [
-    //        "YT_OTHER_PAGE",
-    //        15,
-    //        85
-    //    ],
-    //    [
-    //        "YT_SEARCH",
-    //        8,
-    //        46
-    //    ],
-    //    [
-    //        "NOTIFICATION",
-    //        8,
-    //        14
-    //    ],
-    //    [
-    //        "PLAYLIST",
-    //        6,
-    //        46
-    //    ]
-    //]
-
+	for _, row := range response.Rows {
+		switch row[0] {
+		case "SUBSCRIBER":
+			video.traffic_source.SUBSCRIBER = row[1].(float64)
+		case "RELATED_VIDEO":
+			video.traffic_source.RELATED_VIDEO = row[1].(float64)
+		case "EXT_URL":
+			video.traffic_source.EXT_URL = row[1].(float64)
+		case "NO_LINK_OTHER":
+			video.traffic_source.NO_LINK_OTHER = row[1].(float64)
+		case "YT_CHANNEL":
+			video.traffic_source.YT_CHANNEL = row[1].(float64)
+		case "YT_OTHER_PAGE":
+			video.traffic_source.YT_OTHER_PAGE = row[1].(float64)
+		case "YT_SEARCH":
+			video.traffic_source.YT_SEARCH = row[1].(float64)
+		case "PLAYLIST":
+			video.traffic_source.PLAYLIST = row[1].(float64)
+		case "NOTIFICATION":
+			video.traffic_source.NOTIFICATION = row[1].(float64)
+		}
+	}
 }
 
 func updateVideoTrafficSourceDetail(video *Video) {
