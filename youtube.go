@@ -286,6 +286,45 @@ func updateVideoTrafficSourceType(video *Video) {
 	}
 }
 
+func updateVideoTrafficExternal(video *Video) {
+	enddate_today := time.Now().Format("2006-01-02")
+	filter_query := fmt.Sprintf("video==%s;insightTrafficSourceType==EXT_URL", video.Video_id)
+
+	response := callYTAnalyticsAPI(
+		"insightTrafficSourceDetail", // dimentions
+		"views", // metrics
+		filter_query, // filters
+		STARTDATE_SHOWINT, // startdate
+		enddate_today, // enddate
+		"-views", // sort
+		10, // maxresult
+	)
+
+	m, _ := json.MarshalIndent(response,"","    ")
+	fmt.Println(string(m))
+
+	//TODO: 任意に来るWebサービス名を、構造体でどうやって用意するか、調査
+	//"rows": [
+    //    [
+    //        "twitter.com",
+    //        59
+    //    ],
+    //    [
+    //        "facebook.com",
+    //        12
+    //    ],
+    //    [
+    //        "Creator Studio",
+    //        1
+    //    ],
+    //    [
+    //        "inoreader.com",
+    //        1
+    //    ]
+    //]
+
+}
+
 func updateAgePercentage(video *Video) {
 	enddate_today := time.Now().Format("2006-01-02")
 	filter_query := fmt.Sprintf("video==%s", video.Video_id)
@@ -334,8 +373,8 @@ func updateGenderPercentage(video *Video) {
 		10, // maxresult
 	)
 
-	m, _ := json.MarshalIndent(response,"","    ")
-	fmt.Println(string(m))
+	//m, _ := json.MarshalIndent(response,"","    ")
+	//fmt.Println(string(m))
 
 	for _, row := range response.Rows {
 		switch row[0] {
@@ -349,38 +388,6 @@ func updateGenderPercentage(video *Video) {
 	}
 }
 
-func updateVideoTrafficSourceDetail(video *Video) {
-	enddate_today := time.Now().Format("2006-01-02")
-	filter_query := fmt.Sprintf("video==%s;insightTrafficSourceType==EXT_URL", video.Video_id)
-
-	response := callYTAnalyticsAPI(
-		"insightTrafficSourceDetail", // dimentions
-		"estimatedMinutesWatched,views", // metrics
-		filter_query, // filters
-		STARTDATE_SHOWINT, // startdate
-		enddate_today, // enddate
-		"-estimatedMinutesWatched", // sort
-		10, // maxresult
-	)
-
-	//response := callYTAnalytics(
-	//  channel_id: "channel==MINE",
-	//	dimentions: "insightTrafficSourceDetail",
-	//	metrics: "estimatedMinutesWatched,views",
-	//	filters: "video==ePJIVZZhzRg;insightTrafficSourceType==EXT_URL",
-	//	startdate: "2024-09-10",
-	//	enddate: "2024-09-20",
-	//	sort: "-estimatedMinutesWatched",
-	//	maxresult: 10,
-	//)
-	//
-
-	fmt.Println(response)
-	m, _ := json.MarshalIndent(response,"","    ")
-	fmt.Println(string(m))
-
-	//return response
-}
 
 func gatherVideoStats(startdate string, enddate string) []Video {
 	var video_list_final []Video
@@ -389,6 +396,7 @@ func gatherVideoStats(startdate string, enddate string) []Video {
 	for _, video := range video_list_init {
 		updateVideoCount(&video)
 		updateVideoTrafficSourceType(&video)
+		updateVideoTrafficExternal(&video)
 		updateAgePercentage(&video)
 		updateGenderPercentage(&video)
 		video_list_final = append(video_list_final, video)
