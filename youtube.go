@@ -39,19 +39,19 @@ type Traffic_source_counts struct {
 }
 
 type Age_percentage struct {
-	age13_17	float64
-	age18_24	float64
-	age25_34	float64
-	age35_44 	float64
-	age45_54 	float64
-	age55_64	float64
-	age65_		float64
+	AGE13_17	float64
+	AGE18_24	float64
+	AGE25_34	float64
+	AGE35_44 	float64
+	AGE45_54 	float64
+	AGE55_64	float64
+	AGE65_		float64
 }
 
 type Gender_percentage struct {
-	male			float64
-	female			float64
-	user_specified	float64
+	MALE			float64
+	FEMEL			float64
+	USER_SPECIFIED	float64
 }
 
 type Video struct {
@@ -336,10 +336,6 @@ func updateVideoExternalSites(video *Video) {
 
 }
 
-//TODO
-//なぜか Gender, Age　が video_listの値に入らなくなる不具合あり。
-//"Age_percentage": {}, "Gender_percentage": {}
-
 func updateAgePercentage(video *Video) {
 	enddate_today := time.Now().Format("2006-01-02")
 	filter_query := fmt.Sprintf("video==%s", video.Video_id)
@@ -354,25 +350,25 @@ func updateAgePercentage(video *Video) {
 		10, // maxresult
 	)
 
-	m, _ := json.MarshalIndent(response,"","    ")
-	fmt.Println(string(m))
+	//m, _ := json.MarshalIndent(response,"","    ")
+	//fmt.Println(string(m))
 
 	for _, row := range response.Rows {
 		switch row[0] {
 		case "age13-17":
-			video.Age_percentage.age13_17 = row[1].(float64)
+			video.Age_percentage.AGE13_17 = row[1].(float64)
 		case "age18-24":
-			video.Age_percentage.age18_24 = row[1].(float64)
+			video.Age_percentage.AGE18_24 = row[1].(float64)
 		case "age25-34":
-			video.Age_percentage.age25_34 = row[1].(float64)
+			video.Age_percentage.AGE25_34 = row[1].(float64)
 		case "age35-44":
-			video.Age_percentage.age35_44 = row[1].(float64)
+			video.Age_percentage.AGE35_44 = row[1].(float64)
 		case "age45-54":
-			video.Age_percentage.age45_54 = row[1].(float64)
+			video.Age_percentage.AGE45_54 = row[1].(float64)
 		case "age55-64":
-			video.Age_percentage.age55_64 = row[1].(float64)
+			video.Age_percentage.AGE55_64 = row[1].(float64)
 		case "age65-":
-			video.Age_percentage.age65_ = row[1].(float64)
+			video.Age_percentage.AGE65_ = row[1].(float64)
 		}
 	}
 }
@@ -391,17 +387,17 @@ func updateGenderPercentage(video *Video) {
 		10, // maxresult
 	)
 
-	//m, _ := json.MarshalIndent(response,"","    ")
-	//fmt.Println(string(m))
+	m, _ := json.MarshalIndent(response,"","    ")
+	fmt.Println(string(m))
 
 	for _, row := range response.Rows {
 		switch row[0] {
 		case "male":
-			video.Gender_percentage.male = row[1].(float64)
+			video.Gender_percentage.MALE = row[1].(float64)
 		case "female":
-			video.Gender_percentage.female = row[1].(float64)
+			video.Gender_percentage.FEMEL = row[1].(float64)
 		case "user_specified":
-			video.Gender_percentage.user_specified = row[1].(float64)
+			video.Gender_percentage.USER_SPECIFIED = row[1].(float64)
 		}
 	}
 }

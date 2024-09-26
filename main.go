@@ -23,7 +23,8 @@ func main() {
 	//video_list := getVideoStats(startdate, enddate)
 	
 	startdate := "2024-06-03"
-	enddate := "2024-08-05"
+	//enddate := "2024-08-05"
+	enddate := "2024-06-15"
 	
 	getVideoList(startdate, enddate)
 	video_list := gatherVideoStats(startdate, enddate)
