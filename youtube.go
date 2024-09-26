@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 	"strings"
-	//"encoding/json"
+	"encoding/json"
 
 	"golang.org/x/net/context"
 	"google.golang.org/api/option"
@@ -336,6 +336,10 @@ func updateVideoExternalSites(video *Video) {
 
 }
 
+//TODO
+//なぜか Gender, Age　が video_listの値に入らなくなる不具合あり。
+//"Age_percentage": {}, "Gender_percentage": {}
+
 func updateAgePercentage(video *Video) {
 	enddate_today := time.Now().Format("2006-01-02")
 	filter_query := fmt.Sprintf("video==%s", video.Video_id)
@@ -349,6 +353,9 @@ func updateAgePercentage(video *Video) {
 		"", // sort
 		10, // maxresult
 	)
+
+	m, _ := json.MarshalIndent(response,"","    ")
+	fmt.Println(string(m))
 
 	for _, row := range response.Rows {
 		switch row[0] {
@@ -412,7 +419,12 @@ func gatherVideoStats(startdate string, enddate string) []Video {
 		updateVideoExternalSites(&video)
 		updateAgePercentage(&video)
 		updateGenderPercentage(&video)
+		
 		video_list_final = append(video_list_final, video)
+
+		//image_name := "reports/images/thumbnail_" + video.Video_id + ".jpg"
+		//downloadImage(video.Thumbnail_url, image_name)
+		//trim_YT_Thumbnail(image_name)
 	}
 
 	return video_list_final
