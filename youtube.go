@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 	"strings"
-	"encoding/json"
+	//"encoding/json"
 
 	"golang.org/x/net/context"
 	"google.golang.org/api/option"
@@ -63,6 +63,7 @@ type Video struct {
 	Dislike_counts float64
 	thumbnail_url  string
 	traffic_source Traffic_source_counts
+	External_sites_counts []map[string]float64
 	age_percentage Age_percentage
 	gender_percentage Gender_percentage
 }
@@ -286,7 +287,7 @@ func updateVideoTrafficSourceType(video *Video) {
 	}
 }
 
-func updateVideoTrafficExternal(video *Video) {
+func updateVideoExternalSites(video *Video) {
 	enddate_today := time.Now().Format("2006-01-02")
 	filter_query := fmt.Sprintf("video==%s;insightTrafficSourceType==EXT_URL", video.Video_id)
 
@@ -300,28 +301,13 @@ func updateVideoTrafficExternal(video *Video) {
 		10, // maxresult
 	)
 
-	m, _ := json.MarshalIndent(response,"","    ")
-	fmt.Println(string(m))
+	//m, _ := json.MarshalIndent(response,"","    ")
+	//fmt.Println(string(m))
 
-	//TODO: 任意に来るWebサービス名を、構造体でどうやって用意するか、調査
-	//"rows": [
-    //    [
-    //        "twitter.com",
-    //        59
-    //    ],
-    //    [
-    //        "facebook.com",
-    //        12
-    //    ],
-    //    [
-    //        "Creator Studio",
-    //        1
-    //    ],
-    //    [
-    //        "inoreader.com",
-    //        1
-    //    ]
-    //]
+	for _, row := range response.Rows {
+		sites_counts := map[string]float64{ row[0].(string) : row[1].(float64) }
+		video.External_sites_counts = append(video.External_sites_counts, sites_counts)
+	}
 
 }
 
@@ -396,7 +382,7 @@ func gatherVideoStats(startdate string, enddate string) []Video {
 	for _, video := range video_list_init {
 		updateVideoCount(&video)
 		updateVideoTrafficSourceType(&video)
-		updateVideoTrafficExternal(&video)
+		updateVideoExternalSites(&video)
 		updateAgePercentage(&video)
 		updateGenderPercentage(&video)
 		video_list_final = append(video_list_final, video)
