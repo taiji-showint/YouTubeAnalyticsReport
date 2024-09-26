@@ -25,7 +25,7 @@ type ChannelStats struct {
 
 // These values are defined on sightTrafficSourceType API reference
 // insightTrafficSourceType
-// https://developers.google.com/youtube/analytics/dimensions#Traffic_Source_Dimensions
+// https://developers.google.com/youtube/analytics/dimensions#Traffic_source_Dimensions
 type Traffic_source_counts struct {
 	SUBSCRIBER		float64
 	RELATED_VIDEO	float64
@@ -61,11 +61,11 @@ type Video struct {
 	View_counts    float64
 	Like_counts    float64
 	Dislike_counts float64
-	thumbnail_url  string
-	traffic_source Traffic_source_counts
+	Thumbnail_url  string
+	Traffic_source Traffic_source_counts
 	External_sites_counts []map[string]float64
-	age_percentage Age_percentage
-	gender_percentage Gender_percentage
+	Age_percentage Age_percentage
+	Gender_percentage Gender_percentage
 }
 
 const (
@@ -225,7 +225,7 @@ func getVideoList(startdate string, enddate string) []Video {
 		video.Video_title = item.Snippet.Title
 		video.Video_id = item.Id.VideoId
 		video.Updated_date = strings.Split(item.Snippet.PublishedAt, "T")[0]
-		video.thumbnail_url = item.Snippet.Thumbnails.High.Url
+		video.Thumbnail_url = item.Snippet.Thumbnails.High.Url
 		video_list = append(video_list, video)
 	}
 	return reverseVideoList(video_list)
@@ -266,23 +266,23 @@ func updateVideoTrafficSourceType(video *Video) {
 	for _, row := range response.Rows {
 		switch row[0] {
 		case "SUBSCRIBER":
-			video.traffic_source.SUBSCRIBER = row[1].(float64)
+			video.Traffic_source.SUBSCRIBER = row[1].(float64)
 		case "RELATED_VIDEO":
-			video.traffic_source.RELATED_VIDEO = row[1].(float64)
+			video.Traffic_source.RELATED_VIDEO = row[1].(float64)
 		case "EXT_URL":
-			video.traffic_source.EXT_URL = row[1].(float64)
+			video.Traffic_source.EXT_URL = row[1].(float64)
 		case "NO_LINK_OTHER":
-			video.traffic_source.NO_LINK_OTHER = row[1].(float64)
+			video.Traffic_source.NO_LINK_OTHER = row[1].(float64)
 		case "YT_CHANNEL":
-			video.traffic_source.YT_CHANNEL = row[1].(float64)
+			video.Traffic_source.YT_CHANNEL = row[1].(float64)
 		case "YT_OTHER_PAGE":
-			video.traffic_source.YT_OTHER_PAGE = row[1].(float64)
+			video.Traffic_source.YT_OTHER_PAGE = row[1].(float64)
 		case "YT_SEARCH":
-			video.traffic_source.YT_SEARCH = row[1].(float64)
+			video.Traffic_source.YT_SEARCH = row[1].(float64)
 		case "PLAYLIST":
-			video.traffic_source.PLAYLIST = row[1].(float64)
+			video.Traffic_source.PLAYLIST = row[1].(float64)
 		case "NOTIFICATION":
-			video.traffic_source.NOTIFICATION = row[1].(float64)
+			video.Traffic_source.NOTIFICATION = row[1].(float64)
 		}
 	}
 }
@@ -328,19 +328,19 @@ func updateAgePercentage(video *Video) {
 	for _, row := range response.Rows {
 		switch row[0] {
 		case "age13-17":
-			video.age_percentage.age13_17 = row[1].(float64)
+			video.Age_percentage.age13_17 = row[1].(float64)
 		case "age18-24":
-			video.age_percentage.age18_24 = row[1].(float64)
+			video.Age_percentage.age18_24 = row[1].(float64)
 		case "age25-34":
-			video.age_percentage.age25_34 = row[1].(float64)
+			video.Age_percentage.age25_34 = row[1].(float64)
 		case "age35-44":
-			video.age_percentage.age35_44 = row[1].(float64)
+			video.Age_percentage.age35_44 = row[1].(float64)
 		case "age45-54":
-			video.age_percentage.age45_54 = row[1].(float64)
+			video.Age_percentage.age45_54 = row[1].(float64)
 		case "age55-64":
-			video.age_percentage.age55_64 = row[1].(float64)
+			video.Age_percentage.age55_64 = row[1].(float64)
 		case "age65-":
-			video.age_percentage.age65_ = row[1].(float64)
+			video.Age_percentage.age65_ = row[1].(float64)
 		}
 	}
 }
@@ -365,11 +365,11 @@ func updateGenderPercentage(video *Video) {
 	for _, row := range response.Rows {
 		switch row[0] {
 		case "male":
-			video.gender_percentage.male = row[1].(float64)
+			video.Gender_percentage.male = row[1].(float64)
 		case "female":
-			video.gender_percentage.female = row[1].(float64)
+			video.Gender_percentage.female = row[1].(float64)
 		case "user_specified":
-			video.gender_percentage.user_specified = row[1].(float64)
+			video.Gender_percentage.user_specified = row[1].(float64)
 		}
 	}
 }
@@ -421,7 +421,7 @@ func getVideoStats(startdate string, enddate string) []Video {
 		video.Video_title = search.Snippet.Title
 		video.Video_id = search.Id.VideoId
 		video.Updated_date = strings.Split(search.Snippet.PublishedAt, "T")[0]
-		video.thumbnail_url = search.Snippet.Thumbnails.High.Url
+		video.Thumbnail_url = search.Snippet.Thumbnails.High.Url
 
 		call_video := service.Videos.List([]string{"snippet", "contentDetails", "statistics"}).Id(search.Id.VideoId)
 		response_video, err := call_video.Do()
@@ -481,7 +481,7 @@ func getVideoStats(startdate string, enddate string) []Video {
 		video_list = append(video_list, video)
 
 		image_name := "reports/images/thumbnail_" + video.Video_id + ".jpg"
-		downloadImage(video.thumbnail_url, image_name)
+		downloadImage(video.Thumbnail_url, image_name)
 		trim_YT_Thumbnail(image_name)
 	}
 	video_list = reverseVideoList(video_list)
