@@ -22,7 +22,7 @@ func main() {
 	//today := time.Now().Format("20060102")
 	//video_list := getVideoStats(startdate, enddate)
 	
-	startdate := "2024-09-03"
+	startdate := "2024-09-10"
 	enddate := "2024-09-20"
 	//video_analytics := getVideoTrafficSource("ePJIVZZhzRg")
 	//getVideoTrafficSource("ePJIVZZhzRg")

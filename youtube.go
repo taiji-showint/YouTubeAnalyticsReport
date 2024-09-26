@@ -61,6 +61,8 @@ type Video struct {
 	View_counts    float64
 	Like_counts    float64
 	Dislike_counts float64
+	AnnotationImpressions float64
+	AnnotationClickThroughRate float64
 	Thumbnail_url  string
 	Traffic_source Traffic_source_counts
 	External_sites_counts []map[string]float64
@@ -249,6 +251,29 @@ func updateVideoCount(video *Video) {
 	video.Dislike_counts = response.Rows[0][3].(float64)
 }
 
+// TODO : うまくAnnoutation関連の値が取得できなかった。すべて結果が0のままだった。
+/*
+func updateAnnoutationImplession(video *Video) {
+	enddate_today := time.Now().Format("2006-01-02")
+	filter_query := fmt.Sprintf("video==%s", video.Video_id)
+	response := callYTAnalyticsAPI(
+		"video", // dimentions
+		"views,likes,annotationClickThroughRate,annotationCloseRate,annotationImpressions", // metrics
+		//filter_query, // filters
+		filter_query,
+		STARTDATE_SHOWINT, // startdate
+		enddate_today, // enddateå
+		"-views", // sort
+		5, // maxresult
+	)
+	m, _ := json.MarshalIndent(response,"","    ")
+	fmt.Println(string(m))
+
+	//AnnotationImpressions float64
+	//AnnotationClickThroughRate float64
+}
+*/
+
 func updateVideoTrafficSourceType(video *Video) {
 	enddate_today := time.Now().Format("2006-01-02")
 	filter_query := fmt.Sprintf("video==%s", video.Video_id)
@@ -381,6 +406,8 @@ func gatherVideoStats(startdate string, enddate string) []Video {
 	video_list_init := getVideoList(startdate, enddate)
 	for _, video := range video_list_init {
 		updateVideoCount(&video)
+		// TODO : 正常にAnnoutation関連が取得できないので、一旦停止っｘｓ
+		//updateAnnoutationImplession(&video)
 		updateVideoTrafficSourceType(&video)
 		updateVideoExternalSites(&video)
 		updateAgePercentage(&video)
