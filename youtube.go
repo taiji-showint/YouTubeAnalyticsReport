@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 	"strings"
-	"encoding/json"
+	//"encoding/json"
 
 	"golang.org/x/net/context"
 	"google.golang.org/api/option"
@@ -387,8 +387,8 @@ func updateGenderPercentage(video *Video) {
 		10, // maxresult
 	)
 
-	m, _ := json.MarshalIndent(response,"","    ")
-	fmt.Println(string(m))
+	//m, _ := json.MarshalIndent(response,"","    ")
+	//fmt.Println(string(m))
 
 	for _, row := range response.Rows {
 		switch row[0] {
@@ -409,22 +409,26 @@ func gatherVideoStats(startdate string, enddate string) []Video {
 	video_list_init := getVideoList(startdate, enddate)
 	for _, video := range video_list_init {
 		updateVideoCount(&video)
-		// TODO : 正常にAnnoutation関連が取得できないので、一旦停止っｘｓ
-		//updateAnnoutationImplession(&video)
+		// TODO : 正常にAnnoutation関連が取得できないので、一旦停止
+		// updateAnnoutationImplession(&video)
 		updateVideoTrafficSourceType(&video)
 		updateVideoExternalSites(&video)
 		updateAgePercentage(&video)
 		updateGenderPercentage(&video)
 		
 		video_list_final = append(video_list_final, video)
-
-		//image_name := "reports/images/thumbnail_" + video.Video_id + ".jpg"
-		//downloadImage(video.Thumbnail_url, image_name)
-		//trim_YT_Thumbnail(image_name)
 	}
-
 	return video_list_final
-} 
+}
+
+func getherThumbnailImages(video_list []Video) {
+	for _, video := range video_list {
+		image_name := "reports/images/thumbnail_" + video.Video_id + ".jpg"
+		downloadImage(video.Thumbnail_url, image_name)
+		trim_YT_Thumbnail(image_name)
+	}
+}
+
 
 /*
 func getVideoStats(startdate string, enddate string) []Video {

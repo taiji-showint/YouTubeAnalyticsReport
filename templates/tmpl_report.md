@@ -19,8 +19,8 @@
 |バッド回数|{{ .Dislike_counts }}|
 |インプレッション数|  回|
 |インプレッションからのクリック率|  %|
-|視聴者の年齢と性別| 男性: {{ .Age_percentage.male }} %  女性: {{ .Age_percentage.female  }} |
-|| 13～17 歳 {{ .Age_percentage.age13-17 }}  18～24  歳 {{ .Age_percentage.age18-24 }}   |
+|視聴者の年齢と性別| 男性: {{ .Gender_percentage.MALE }} %  女性: {{ .Gender_percentage.FEMEL  }} |
+|| 13～17 歳 {{ .Age_percentage.AGE13_17 }}  18～24  歳 {{ .Age_percentage.AGE18_24 }}   |
 |トラフィック流入元||
 <div style="page-break-before:always"></div>
 {{ end }}
