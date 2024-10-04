@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"text/template"
+	"strings"
 )
 
 func render_report(video_list []Video, date string, yearly bool) {
@@ -26,6 +27,8 @@ func render_report(video_list []Video, date string, yearly bool) {
 	}
 
 	var report_filename string
+	date = strings.ReplaceAll(date, "-", "")
+
 	if yearly {
 		report_filename = "reports/showint_report_yearly_" + date + ".md"
 	} else {
