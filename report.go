@@ -8,12 +8,6 @@ import (
 
 func render_report(video_list []Video, date string, yearly bool) {
 
-	// custom logic to culuculate remainder
-	//funcMap := template.FuncMap{
-	//	"mod": func(a, b int) int {
-	//		return a % b
-	//	},
-	//}
 	var template_filename string
 	if yearly {
 		template_filename = "templates/tmpl_report_yearly.md"

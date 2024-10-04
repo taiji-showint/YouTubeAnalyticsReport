@@ -68,6 +68,8 @@ type Video struct {
 	External_sites_counts []map[string]float64
 	Age_percentage Age_percentage
 	Gender_percentage Gender_percentage
+	Today string
+	Duration int64
 }
 
 const (
@@ -231,6 +233,16 @@ func getVideoList(startdate string, enddate string) []Video {
 		video_list = append(video_list, video)
 	}
 	return reverseVideoList(video_list)
+}
+
+func calcDuration(video *Video, today string){
+	video.Today = today
+
+	var format = "2006-01-02"
+	time_start, _ := time.Parse(format, video.Updated_date)
+	time_end, _   := time.Parse(format, today)
+	time_diff_hours := time_end.Sub(time_start).Hours()
+	video.Duration = int64(time_diff_hours) / 24
 }
 
 func updateVideoCount(video *Video) {
@@ -403,19 +415,22 @@ func updateGenderPercentage(video *Video) {
 }
 
 
-func gatherVideoStats(startdate string, enddate string) []Video {
+func gatherVideoStats(startdate string, enddate string, today string) []Video {
 	var video_list_final []Video
 
 	video_list_init := getVideoList(startdate, enddate)
 	for _, video := range video_list_init {
+		fmt.Printf("Gathering Video Stats : %s\n", video.Video_title )
+		calcDuration(&video, today)
 		updateVideoCount(&video)
-		// TODO : 正常にAnnoutation関連が取得できないので、一旦停止
-		// updateAnnoutationImplession(&video)
 		updateVideoTrafficSourceType(&video)
 		updateVideoExternalSites(&video)
 		updateAgePercentage(&video)
 		updateGenderPercentage(&video)
+		// TODO : 正常にAnnoutation関連が取得できないので、一旦停止
+		// updateAnnoutationImplession(&video)
 		
+
 		video_list_final = append(video_list_final, video)
 	}
 	return video_list_final
@@ -424,8 +439,14 @@ func gatherVideoStats(startdate string, enddate string) []Video {
 func getherThumbnailImages(video_list []Video) {
 	for _, video := range video_list {
 		image_name := "reports/images/thumbnail_" + video.Video_id + ".jpg"
-		downloadImage(video.Thumbnail_url, image_name)
-		trim_YT_Thumbnail(image_name)
+		_, err := os.Stat(image_name)
+		if os.IsNotExist(err) {
+			fmt.Printf("Downloading Thumbnail iamge : %s", image_name)
+			downloadImage(video.Thumbnail_url, image_name)
+			trim_YT_Thumbnail(image_name)
+		}else {
+			fmt.Printf("%s is already exist. Skipping...\n", image_name)
+		}
 	}
 }
 

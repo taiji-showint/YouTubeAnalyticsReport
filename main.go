@@ -20,11 +20,11 @@ func main() {
 	//enddate := "2024-09-20T23:00:00Z"
 
 	startdate := "2024-06-03"
+	//startdate := "2024-07-20"
 	enddate := "2024-08-05"
 	today := time.Now().Format("2006-01-02")
 	
-	getVideoList(startdate, enddate)
-	video_list := gatherVideoStats(startdate, enddate)
+	video_list := gatherVideoStats(startdate, enddate, today)
 	getherThumbnailImages(video_list)
 	
 	m, _ := json.MarshalIndent(video_list,"","    ")
