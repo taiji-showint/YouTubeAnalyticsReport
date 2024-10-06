@@ -4,16 +4,11 @@ import (
 	"fmt"
 	"os"
 	"text/template"
+	"strings"
 )
 
 func render_report(video_list []Video, date string, yearly bool) {
 
-	// custom logic to culuculate remainder
-	//funcMap := template.FuncMap{
-	//	"mod": func(a, b int) int {
-	//		return a % b
-	//	},
-	//}
 	var template_filename string
 	if yearly {
 		template_filename = "templates/tmpl_report_yearly.md"
@@ -32,6 +27,8 @@ func render_report(video_list []Video, date string, yearly bool) {
 	}
 
 	var report_filename string
+	date = strings.ReplaceAll(date, "-", "")
+
 	if yearly {
 		report_filename = "reports/showint_report_yearly_" + date + ".md"
 	} else {
