@@ -8,6 +8,8 @@ import (
 	"os"
 	"time"
 	"strings"
+	"math"
+	
 	//"encoding/json"
 
 	"golang.org/x/net/context"
@@ -26,10 +28,11 @@ type ChannelStats struct {
 // These values are defined on sightTrafficSourceType API reference
 // insightTrafficSourceType
 // https://developers.google.com/youtube/analytics/dimensions#Traffic_source_Dimensions
-type Traffic_source_counts struct {
+type Traffic_source struct {
 	SUBSCRIBER		float64
 	RELATED_VIDEO	float64
-	EXT_URL 		float64
+	EXT_URL_ratio 	float64
+	EXT_URL_count 	float64
 	NO_LINK_OTHER	float64
 	YT_CHANNEL		float64
 	YT_OTHER_PAGE	float64
@@ -64,8 +67,8 @@ type Video struct {
 	AnnotationImpressions float64
 	AnnotationClickThroughRate float64
 	Thumbnail_url  string
-	Traffic_source Traffic_source_counts
-	External_sites_counts []map[string]float64
+	Traffic_source Traffic_source
+	External_sites []map[string]float64
 	Age_percentage Age_percentage
 	Gender_percentage Gender_percentage
 	Today string
@@ -286,6 +289,10 @@ func updateAnnoutationImplession(video *Video) {
 }
 */
 
+func truncFloat(num float64) float64 {
+	return math.Floor(num * 10) / 10
+}
+
 func updateVideoTrafficSourceType(video *Video) {
 	enddate_today := time.Now().Format("2006-01-02")
 	filter_query := fmt.Sprintf("video==%s", video.Video_id)
@@ -301,27 +308,31 @@ func updateVideoTrafficSourceType(video *Video) {
 	)
 
 	for _, row := range response.Rows {
+		ratio := truncFloat( row[1].(float64) / video.View_counts * 100 )
 		switch row[0] {
 		case "SUBSCRIBER":
-			video.Traffic_source.SUBSCRIBER = row[1].(float64)
+			video.Traffic_source.SUBSCRIBER 	= ratio
 		case "RELATED_VIDEO":
-			video.Traffic_source.RELATED_VIDEO = row[1].(float64)
+			video.Traffic_source.RELATED_VIDEO 	= ratio
 		case "EXT_URL":
-			video.Traffic_source.EXT_URL = row[1].(float64)
+			video.Traffic_source.EXT_URL_ratio	= ratio
+			video.Traffic_source.EXT_URL_count  = row[1].(float64)
 		case "NO_LINK_OTHER":
-			video.Traffic_source.NO_LINK_OTHER = row[1].(float64)
+			video.Traffic_source.NO_LINK_OTHER 	= ratio
 		case "YT_CHANNEL":
-			video.Traffic_source.YT_CHANNEL = row[1].(float64)
+			video.Traffic_source.YT_CHANNEL 	= ratio
 		case "YT_OTHER_PAGE":
-			video.Traffic_source.YT_OTHER_PAGE = row[1].(float64)
+			video.Traffic_source.YT_OTHER_PAGE 	= ratio
 		case "YT_SEARCH":
-			video.Traffic_source.YT_SEARCH = row[1].(float64)
+			video.Traffic_source.YT_SEARCH 		= ratio
 		case "PLAYLIST":
-			video.Traffic_source.PLAYLIST = row[1].(float64)
+			video.Traffic_source.PLAYLIST 		= ratio
 		case "NOTIFICATION":
-			video.Traffic_source.NOTIFICATION = row[1].(float64)
+			video.Traffic_source.NOTIFICATION 	= ratio
 		}
 	}
+	//m, _ := json.MarshalIndent(video,"","    ")
+	//fmt.Println(string(m))	
 }
 
 func updateVideoExternalSites(video *Video) {
@@ -342,8 +353,11 @@ func updateVideoExternalSites(video *Video) {
 	//fmt.Println(string(m))
 
 	for _, row := range response.Rows {
-		sites_counts := map[string]float64{ row[0].(string) : row[1].(float64) }
-		video.External_sites_counts = append(video.External_sites_counts, sites_counts)
+		site_name := row[0].(string)
+		site_count := row[1].(float64)
+		site_ratio := truncFloat( site_count / video.Traffic_source.EXT_URL_count * 100 )
+		site_list := map[string]float64{ site_name : site_ratio }
+		video.External_sites = append(video.External_sites, site_list)
 	}
 
 }

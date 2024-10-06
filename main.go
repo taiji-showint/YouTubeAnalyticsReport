@@ -19,8 +19,8 @@ func main() {
 	//startdate := "2024-09-10T00:00:00Z"
 	//enddate := "2024-09-20T23:00:00Z"
 
-	startdate := "2024-06-03"
-	//startdate := "2024-07-20"
+	//startdate := "2024-06-03"
+	startdate := "2024-07-20"
 	enddate := "2024-08-05"
 	today := time.Now().Format("2006-01-02")
 	
