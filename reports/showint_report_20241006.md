@@ -26,25 +26,14 @@
 |バッド回数|2|
 |インプレッション数| 0 回|
 |インプレッションからのクリック率| 0 %|
-|視聴者の年齢と性別| 男性: 96.6 %  女性: 3.4%<br>13～17 歳 0%&nbsp;&nbsp;&nbsp;&nbsp;18～24 歳 0%<br>25～34 歳 65.2%&nbsp;&nbsp;&nbsp;&nbsp;35～44 歳 34.8%<br>44～54 歳 0%&nbsp;&nbsp;&nbsp;&nbsp;55～64 歳 0%&nbsp;&nbsp;&nbsp;&nbsp;65 歳以上 0% 
-|
-|トラフィック流入元|
-show int 登録者へのおすすめ : 71.8% 
-show int チャンネルページ : 7.3% 
-show int 再生リスト : 0.7% 
-show int 登録者への通知機能 : 0.8%
-YouTube関連動画 : 4.8% 
-YouTube検索 : 0.7% 
-その他のYouTube機能 : 1.9% 
-その他 : 3.2% 
-外部サイトからの流入 : 8.3% 
-外部サイトからの流入の内訳 :
+|視聴者の年齢と性別| 男性: 96.6 %  女性: 3.4%<br>13～17 歳 0%        18～24 歳 0%        25～34 歳 65.2%        35～44 歳 34.8%<br>44～54 歳 0%        55～64 歳 0%        65 歳以上 0% |
+|トラフィック流入元|show int 登録者へのおすすめ : 71.8% <br> show int チャンネルページ : 7.3% <br> show int 再生リスト : 0.7% <br> show int 登録者への通知機能 : 0.8% <br> YouTube関連動画 : 4.8%  <br> YouTube検索 : 0.7% <br> その他のYouTube機能 : 1.9%  <br> その他 : 3.2% <br> 外部サイトからの流入 : 8.3%|
+|外部サイトからの流入の内訳|
     twitter.com : 42.6%
     facebook.com : 36%
     Google : 8%
     Google Search : 2.6%
-    Creator Studio : 1.3%
-|
+    Creator Studio : 1.3%|
 <div style="page-break-before:always"></div>
 
 |||
@@ -59,26 +48,15 @@ YouTube検索 : 0.7%
 |バッド回数|0|
 |インプレッション数| 0 回|
 |インプレッションからのクリック率| 0 %|
-|視聴者の年齢と性別| 男性: 100 %  女性: 0%<br>13～17 歳 0%&nbsp;&nbsp;&nbsp;&nbsp;18～24 歳 0%<br>25～34 歳 54.3%&nbsp;&nbsp;&nbsp;&nbsp;35～44 歳 29.1%<br>44～54 歳 16.5%&nbsp;&nbsp;&nbsp;&nbsp;55～64 歳 0%&nbsp;&nbsp;&nbsp;&nbsp;65 歳以上 0% 
-|
-|トラフィック流入元|
-show int 登録者へのおすすめ : 53.6% 
-show int チャンネルページ : 12.2% 
-show int 再生リスト : 0.5% 
-show int 登録者への通知機能 : 2%
-YouTube関連動画 : 6.7% 
-YouTube検索 : 1.8% 
-その他のYouTube機能 : 3.7% 
-その他 : 11.7% 
-外部サイトからの流入 : 7.4% 
-外部サイトからの流入の内訳 :
+|視聴者の年齢と性別| 男性: 100 %  女性: 0%<br>13～17 歳 0%        18～24 歳 0%        25～34 歳 54.3%        35～44 歳 29.1%<br>44～54 歳 16.5%        55～64 歳 0%        65 歳以上 0% |
+|トラフィック流入元|show int 登録者へのおすすめ : 53.6% <br> show int チャンネルページ : 12.2% <br> show int 再生リスト : 0.5% <br> show int 登録者への通知機能 : 2% <br> YouTube関連動画 : 6.7%  <br> YouTube検索 : 1.8% <br> その他のYouTube機能 : 3.7%  <br> その他 : 11.7% <br> 外部サイトからの流入 : 7.4%|
+|外部サイトからの流入の内訳|
     twitter.com : 47.5%
     facebook.com : 22.5%
     Google Search : 7.5%
     com.Slack : 7.5%
     Discord : 2.5%
-    Gmail : 2.5%
-|
+    Gmail : 2.5%|
 <div style="page-break-before:always"></div>
 
 |||
@@ -93,26 +71,15 @@ YouTube検索 : 1.8%
 |バッド回数|0|
 |インプレッション数| 0 回|
 |インプレッションからのクリック率| 0 %|
-|視聴者の年齢と性別| 男性: 100 %  女性: 0%<br>13～17 歳 0%&nbsp;&nbsp;&nbsp;&nbsp;18～24 歳 12.5%<br>25～34 歳 52.3%&nbsp;&nbsp;&nbsp;&nbsp;35～44 歳 35.2%<br>44～54 歳 0%&nbsp;&nbsp;&nbsp;&nbsp;55～64 歳 0%&nbsp;&nbsp;&nbsp;&nbsp;65 歳以上 0% 
-|
-|トラフィック流入元|
-show int 登録者へのおすすめ : 54.3% 
-show int チャンネルページ : 12.6% 
-show int 再生リスト : 0.3% 
-show int 登録者への通知機能 : 1.1%
-YouTube関連動画 : 7% 
-YouTube検索 : 2.9% 
-その他のYouTube機能 : 3.4% 
-その他 : 8.4% 
-外部サイトからの流入 : 9.4% 
-外部サイトからの流入の内訳 :
+|視聴者の年齢と性別| 男性: 100 %  女性: 0%<br>13～17 歳 0%        18～24 歳 12.5%        25～34 歳 52.3%        35～44 歳 35.2%<br>44～54 歳 0%        55～64 歳 0%        65 歳以上 0% |
+|トラフィック流入元|show int 登録者へのおすすめ : 54.3% <br> show int チャンネルページ : 12.6% <br> show int 再生リスト : 0.3% <br> show int 登録者への通知機能 : 1.1% <br> YouTube関連動画 : 7%  <br> YouTube検索 : 2.9% <br> その他のYouTube機能 : 3.4%  <br> その他 : 8.4% <br> 外部サイトからの流入 : 9.4%|
+|外部サイトからの流入の内訳|
     twitter.com : 60.5%
     facebook.com : 18.4%
     hatenablog.jp : 5.2%
     Google Search : 2.6%
     streamline-wf-hi.appspot.com : 2.6%
     Creator Studio : 1.3%
-    feedly.com : 1.3%
-|
+    feedly.com : 1.3%|
 <div style="page-break-before:always"></div>
 
