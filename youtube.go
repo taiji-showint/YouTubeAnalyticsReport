@@ -267,27 +267,27 @@ func updateVideoCount(video *Video) {
 }
 
 // TODO : うまくAnnoutation関連の値が取得できなかった。すべて結果が0のままだった。
-/*
 func updateAnnoutationImplession(video *Video) {
 	enddate_today := time.Now().Format("2006-01-02")
 	filter_query := fmt.Sprintf("video==%s", video.Video_id)
 	response := callYTAnalyticsAPI(
 		"video", // dimentions
-		"views,likes,annotationClickThroughRate,annotationCloseRate,annotationImpressions", // metrics
+		"annotationImpressions,annotationClickThroughRate,", // metrics
 		//filter_query, // filters
 		filter_query,
 		STARTDATE_SHOWINT, // startdate
 		enddate_today, // enddateå
-		"-views", // sort
+		"", // sort
 		5, // maxresult
 	)
-	m, _ := json.MarshalIndent(response,"","    ")
-	fmt.Println(string(m))
+	//m, _ := json.MarshalIndent(response,"","    ")
+	//fmt.Println(string(m))
 
-	//AnnotationImpressions float64
-	//AnnotationClickThroughRate float64
+	for _, row := range response.Rows {
+		video.AnnotationImpressions = row[1].(float64)
+		video.AnnotationClickThroughRate = row[2].(float64)
+	}
 }
-*/
 
 func truncFloat(num float64) float64 {
 	return math.Floor(num * 10) / 10
@@ -442,7 +442,7 @@ func gatherVideoStats(startdate string, enddate string, today string) []Video {
 		updateAgePercentage(&video)
 		updateGenderPercentage(&video)
 		// TODO : 正常にAnnoutation関連が取得できないので、一旦停止
-		// updateAnnoutationImplession(&video)
+		updateAnnoutationImplession(&video)
 		
 
 		video_list_final = append(video_list_final, video)
