@@ -20,14 +20,7 @@
 |バッド回数|{{ .Dislike_counts }}|
 |インプレッション数| {{ .AnnotationImpressions }} 回|
 |インプレッションからのクリック率| {{ .AnnotationClickThroughRate }} %|
-|視聴者の年齢と性別| 男性: {{ .Gender_percentage.MALE }} %  女性: {{ .Gender_percentage.FEMEL  }}%  
-13～17 歳 {{ .Age_percentage.AGE13_17 }}%
-18～24 歳 {{ .Age_percentage.AGE18_24 }}%   
-25～34 歳 {{ .Age_percentage.AGE25_34 }}%
-35～44 歳 {{ .Age_percentage.AGE35_44 }}% 
-44～54 歳 {{ .Age_percentage.AGE45_54 }}%  
-55～64 歳 {{ .Age_percentage.AGE55_64 }}% 
-65 歳以上 {{ .Age_percentage.AGE65_ }}% 
+|視聴者の年齢と性別| 男性: {{ .Gender_percentage.MALE }} %  女性: {{ .Gender_percentage.FEMEL  }}%<br>13～17 歳 {{ .Age_percentage.AGE13_17 }}%&nbsp;&nbsp;&nbsp;&nbsp;18～24 歳 {{ .Age_percentage.AGE18_24 }}%<br>25～34 歳 {{ .Age_percentage.AGE25_34 }}%&nbsp;&nbsp;&nbsp;&nbsp;35～44 歳 {{ .Age_percentage.AGE35_44 }}%<br>44～54 歳 {{ .Age_percentage.AGE45_54 }}%&nbsp;&nbsp;&nbsp;&nbsp;55～64 歳 {{ .Age_percentage.AGE55_64 }}%&nbsp;&nbsp;&nbsp;&nbsp;65 歳以上 {{ .Age_percentage.AGE65_ }}% 
 |
 |トラフィック流入元|
 show int 登録者へのおすすめ : {{ .Traffic_source.SUBSCRIBER }}% 
