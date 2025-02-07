@@ -1,10 +1,11 @@
 package main
 
 import (
-	"log"
-	"fmt"
-	"time"
 	"encoding/json"
+	"fmt"
+	"log"
+	"time"
+
 	"github.com/joho/godotenv"
 )
 
@@ -15,16 +16,16 @@ func main() {
 	}
 
 	//channel_stats := getChannelStats()
-	
-	startdate := "2024-08-12"
+
+	startdate := "2024-10-21"
 	//startdate := "2024-07-20"
-	enddate := "2024-10-14"
+	enddate := "2024-12-31"
 	today := time.Now().Format("2006-01-02")
-	
+
 	video_list := gatherVideoStats(startdate, enddate, today)
 	getherThumbnailImages(video_list)
-	
-	m, _ := json.MarshalIndent(video_list,"","    ")
+
+	m, _ := json.MarshalIndent(video_list, "", "    ")
 	fmt.Println(string(m))
 
 	// 通常レポート(yearly=false)
