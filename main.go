@@ -17,9 +17,9 @@ func main() {
 
 	//channel_stats := getChannelStats()
 
-	startdate := "2025-06-30"
+	startdate := "2025-09-22"
 	//startdate := "2024-07-20"
-	enddate := "2025-09-14"
+	enddate := "2025-12-01"
 	today := time.Now().Format("2006-01-02")
 
 	video_list := gatherVideoStats(startdate, enddate, today)
