@@ -83,6 +83,17 @@ type Video struct {
 	Gender_percentage Gender_percentage
 	Today string
 	Duration int64
+	// Channel-wide statistics
+	TotalViews      string
+	TotalWatchHours string
+	TotalImpressions string
+	ChannelCTR      float64
+	TotalSubscribers string
+	NewSubscribers   string
+	ChannelGender   Gender_percentage
+	ChannelAge      Age_percentage
+	TopTenVideos    []Video
+	AvgWatchTime    float64
 }
 
 const (
@@ -140,7 +151,13 @@ func getChannelStats() ChannelStats {
 	}
 	for _, ch := range response_channel.Items {
 		channel_stats.Channel_title = ch.Snippet.Title
-		channel_stats.Subscribers = string(ch.Statistics.SubscriberCount)
+		// Convert subscriber count to string
+		if ch.Statistics.SubscriberCount > 0 {
+			channel_stats.Subscribers = fmt.Sprintf("%d", ch.Statistics.SubscriberCount)
+		} else {
+			// If SubscriberCount is 0 or not available, set to empty
+			channel_stats.Subscribers = ""
+		}
 		//channel_stats.Channel_id = ch.Id
 		//fmt.Println(strings.Repeat("=", 50))
 		//fmt.Println("Channel Title: ", channel.Snippet.Title)
@@ -149,6 +166,30 @@ func getChannelStats() ChannelStats {
 		//fmt.Println(strings.Repeat("=", 50))
 	}
 	return channel_stats
+}
+
+func getNewSubscribers(startdate string, enddate string) int64 {
+	response := callYTAnalyticsAPI(
+		"", // dimensions - empty for summary
+		"subscribersGained", // metrics
+		"", // filters
+		startdate,
+		enddate,
+		"", // sort
+		1, // maxresult
+	)
+
+	if response == nil || len(response.Rows) == 0 {
+		return 0
+	}
+
+	// subscribersGained is in response.Rows[0][0]
+	fmt.Printf("DEBUG getNewSubscribers: response.Rows=%v\n", response.Rows)
+	if count, ok := response.Rows[0][0].(float64); ok {
+		fmt.Printf("DEBUG getNewSubscribers: count=%v\n", count)
+		return int64(count)
+	}
+	return 0
 }
 
 // YouTube Data API
@@ -223,7 +264,8 @@ func callYTAnalyticsAPI(
 
 	response, err := call.Do()
 	if err != nil {
-		log.Fatalf("Error making YouTube Analytics API call: %v", err)
+		log.Printf("Warning: YouTube Analytics API call failed (will use CSV data): %v", err)
+		return nil
 	}
 	return response
 }
@@ -261,7 +303,7 @@ func calcDuration(video *Video, today string){
 func updateVideoCount(video *Video) {
 	enddate_today := time.Now().Format("2006-01-02")
 	filter_query := fmt.Sprintf("video==%s", video.Video_id)
-	
+
 	response := callYTAnalyticsAPI(
 		"video", // dimentions
 		"views,likes,dislikes", // metrics
@@ -271,6 +313,9 @@ func updateVideoCount(video *Video) {
 		"", // sort
 		5, // maxresult
 	)
+	if response == nil || len(response.Rows) == 0 {
+		return
+	}
 	video.View_counts = response.Rows[0][1].(float64)
 	video.Like_counts = response.Rows[0][2].(float64)
 	video.Dislike_counts = response.Rows[0][3].(float64)
@@ -316,6 +361,9 @@ func updateVideoTrafficSourceType(video *Video) {
 		"-views", // sort
 		15, // maxresult
 	)
+	if response == nil || len(response.Rows) == 0 {
+		return
+	}
 
 	for _, row := range response.Rows {
 		// Avoid division by zero
@@ -365,6 +413,9 @@ func updateVideoExternalSites(video *Video) {
 		"-views", // sort
 		10, // maxresult
 	)
+	if response == nil || len(response.Rows) == 0 {
+		return
+	}
 
 	//m, _ := json.MarshalIndent(response,"","    ")
 	//fmt.Println(string(m))
@@ -398,6 +449,9 @@ func updateAgePercentage(video *Video) {
 		"", // sort
 		10, // maxresult
 	)
+	if response == nil || len(response.Rows) == 0 {
+		return
+	}
 
 	//m, _ := json.MarshalIndent(response,"","    ")
 	//fmt.Println(string(m))
@@ -435,6 +489,9 @@ func updateGenderPercentage(video *Video) {
 		"", // sort
 		10, // maxresult
 	)
+	if response == nil || len(response.Rows) == 0 {
+		return
+	}
 
 	//m, _ := json.MarshalIndent(response,"","    ")
 	//fmt.Println(string(m))
