@@ -9,20 +9,28 @@ import (
 	"time"
 	"strings"
 	"math"
-	
+	"encoding/csv"
+	"strconv"
+
 	//"encoding/json"
 
 	"golang.org/x/net/context"
 	"google.golang.org/api/option"
 	"google.golang.org/api/youtube/v3"
 	"google.golang.org/api/youtubeanalytics/v2"
-	
+
 )
 
 type ChannelStats struct {
 	Channel_title string
 	Subscribers   string
 	Channel_id    string
+}
+
+// AnalyticsData stores impressions and CTR data from YouTube Studio CSV export
+type AnalyticsData struct {
+	Impressions float64
+	CTR         float64 // Click-through rate in percentage
 }
 
 // These values are defined on sightTrafficSourceType API reference
@@ -66,6 +74,8 @@ type Video struct {
 	Dislike_counts float64
 	AnnotationImpressions float64
 	AnnotationClickThroughRate float64
+	Impressions    float64 // Impressions from YouTube Studio
+	CTR            float64 // Click-through rate in percentage
 	Thumbnail_url  string
 	Traffic_source Traffic_source
 	External_sites []map[string]float64
@@ -441,9 +451,10 @@ func gatherVideoStats(startdate string, enddate string, today string) []Video {
 		updateVideoExternalSites(&video)
 		updateAgePercentage(&video)
 		updateGenderPercentage(&video)
-		// TODO : 正常にAnnoutation関連が取得できないので、一旦停止
-		updateAnnoutationImplession(&video)
-		
+		// NOTE: Impressions and CTR are now loaded from YouTube Studio CSV export
+		// Annotations are deprecated, so we skip this:
+		// updateAnnoutationImplession(&video)
+
 
 		video_list_final = append(video_list_final, video)
 	}
@@ -462,4 +473,85 @@ func getherThumbnailImages(video_list []Video) {
 			fmt.Printf("%s is already exist. Skipping...\n", image_name)
 		}
 	}
+}
+
+// loadAnalyticsFromCSV reads impressions and CTR data from YouTube Studio CSV export
+// Expected CSV format: コンテンツ, 動画のタイトル, 動画公開時刻, 長さ, 視聴回数, インプレッション数, インプレッションのクリック率(%), 平均視聴時間
+func loadAnalyticsFromCSV(csvPath string) (map[string]AnalyticsData, error) {
+	file, err := os.Open(csvPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open CSV file: %v", err)
+	}
+	defer file.Close()
+
+	reader := csv.NewReader(file)
+	// Skip header row
+	_, err = reader.Read()
+	if err != nil {
+		return nil, fmt.Errorf("failed to read CSV header: %v", err)
+	}
+
+	analyticsMap := make(map[string]AnalyticsData)
+
+	for {
+		record, err := reader.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, fmt.Errorf("failed to read CSV record: %v", err)
+		}
+
+		// Skip summary row (コンテンツが "合計")
+		if record[0] == "合計" {
+			continue
+		}
+
+		// Expected columns: [0]=コンテンツ, [1]=動画のタイトル, [2]=動画公開時刻, [3]=長さ, [4]=視聴回数, [5]=インプレッション数, [6]=インプレッションのクリック率(%), [7]=平均視聴時間
+		if len(record) < 7 {
+			continue
+		}
+
+		videoID := record[0]
+		impressionStr := record[5]
+		ctrStr := strings.TrimSpace(record[6])
+
+		// Parse impressions
+		impressions, err := strconv.ParseFloat(impressionStr, 64)
+		if err != nil {
+			fmt.Printf("Warning: failed to parse impressions for video %s: %v\n", videoID, err)
+			impressions = 0
+		}
+
+		// Parse CTR (remove % sign if present)
+		ctrStr = strings.TrimSuffix(ctrStr, "%")
+		ctrStr = strings.TrimSpace(ctrStr)
+		ctr, err := strconv.ParseFloat(ctrStr, 64)
+		if err != nil {
+			fmt.Printf("Warning: failed to parse CTR for video %s: %v\n", videoID, err)
+			ctr = 0
+		}
+
+		analyticsMap[videoID] = AnalyticsData{
+			Impressions: impressions,
+			CTR:         ctr,
+		}
+	}
+
+	fmt.Printf("Loaded analytics data for %d videos from CSV\n", len(analyticsMap))
+	return analyticsMap, nil
+}
+
+// mergeAnalyticsData merges impressions and CTR data from YouTube Studio CSV into video list
+func mergeAnalyticsData(videoList []Video, analyticsMap map[string]AnalyticsData) []Video {
+	for i, video := range videoList {
+		if analytics, exists := analyticsMap[video.Video_id]; exists {
+			videoList[i].Impressions = analytics.Impressions
+			videoList[i].CTR = analytics.CTR
+			fmt.Printf("Merged analytics for: %s (Impressions: %.0f, CTR: %.2f%%)\n", video.Video_title, analytics.Impressions, analytics.CTR)
+		} else {
+			fmt.Printf("Warning: no analytics data found for video %s\n", video.Video_id)
+		}
+	}
+	return videoList
 }

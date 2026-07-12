@@ -18,8 +18,8 @@
 |再生回数|{{ .View_counts }} 回|
 |グッド回数|{{ .Like_counts }}|
 |バッド回数|{{ .Dislike_counts }}|
-|インプレッション数| {{ .AnnotationImpressions }} 回|
-|インプレッションからのクリック率| {{ .AnnotationClickThroughRate }} %|
+|インプレッション数|{{ printf "%.0f" .Impressions }} 回|
+|インプレッションからのクリック率|{{ printf "%.2f" .CTR }} %|
 |視聴者の年齢と性別| 男性: {{ .Gender_percentage.MALE }} %  女性: {{ .Gender_percentage.FEMEL  }}%<br>13～17 歳 {{ .Age_percentage.AGE13_17 }}%        18～24 歳 {{ .Age_percentage.AGE18_24 }}%        25～34 歳 {{ .Age_percentage.AGE25_34 }}%        35～44 歳 {{ .Age_percentage.AGE35_44 }}%<br>44～54 歳 {{ .Age_percentage.AGE45_54 }}%        55～64 歳 {{ .Age_percentage.AGE55_64 }}%        65 歳以上 {{ .Age_percentage.AGE65_ }}% |
 |トラフィック流入元|show int 登録者へのおすすめ : {{ .Traffic_source.SUBSCRIBER }}% <br> show int チャンネルページ : {{ .Traffic_source.YT_CHANNEL }}% YouTube関連動画 : {{ .Traffic_source.RELATED_VIDEO }}%  <br> YouTube検索 : {{ .Traffic_source.YT_SEARCH }}% <br> 外部サイトからの流入 : {{ .Traffic_source.EXT_URL_ratio }}%|
 
