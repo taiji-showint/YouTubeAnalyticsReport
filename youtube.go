@@ -468,7 +468,6 @@ func gatherVideoStats(startdate string, enddate string, today string) []Video {
 		// Annotations are deprecated, so we skip this:
 		// updateAnnoutationImplession(&video)
 
-
 		video_list_final = append(video_list_final, video)
 	}
 	return video_list_final

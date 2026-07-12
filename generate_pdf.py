@@ -1,120 +1,120 @@
 #!/usr/bin/env python3
 """
-Generate 2-column PDF report from JSON video statistics
+Generate 2-column PDF report using reportlab + matplotlib + PIL
+Includes graphs, thumbnails, and detailed analytics with Japanese text support
 Usage: python3 generate_pdf.py <input_json> <output_pdf>
 """
 
 import json
 import sys
 import os
+import base64
 from datetime import datetime
+from io import BytesIO
+import matplotlib.pyplot as plt
+from PIL import Image, ImageDraw, ImageFont
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import cm
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak, Image
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak, Image as RLImage
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-
-# Register Japanese fonts
-def register_japanese_fonts():
-    """Register Japanese fonts for PDF generation"""
-    # Try multiple font paths and formats
-    font_candidates = [
-        # macOS standard fonts
-        ("/System/Library/Fonts/Hiragino Sans W3.ttc", "Japanese"),
-        ("/Library/Fonts/Hiragino Sans W3.ttc", "Japanese"),
-        ("/System/Library/Fonts/STHeiti Medium.ttc", "Japanese"),
-        # Try to find individual TTF files from Noto Sans CJK
-        ("/Library/Fonts/NotoSansCJK-Regular.ttc", "Japanese"),
-        ("/usr/local/opt/font-noto-sans-cjk/share/fonts/opentype/NotoSansCJK-Regular.ttc", "Japanese"),
-    ]
-
-    font_registered = False
-    for font_path, font_name in font_candidates:
-        if os.path.exists(font_path):
-            try:
-                # Try to register the font
-                pdfmetrics.registerFont(TTFont(font_name, font_path))
-                print(f"Registered Japanese font from: {font_path}")
-                font_registered = True
-                break
-            except Exception as e:
-                print(f"Trying alternative: {font_path} failed: {e}")
-                continue
-
-    if not font_registered:
-        print("Warning: Could not register Japanese font.")
-        print("Attempting to use system fonts...")
-        # If TTC doesn't work, try using reportlab's built-in CJK support
-        try:
-            from reportlab.pdfbase.cidfonts import UniFont, CIDFont
-            print("Note: Using reportlab's CID font system")
-            font_registered = True
-        except:
-            print("Warning: Text may not display correctly.")
-
-    return font_registered
+from reportlab.lib import colors
 
 def load_json_data(json_file):
     """Load video statistics from JSON file"""
     with open(json_file, 'r', encoding='utf-8') as f:
         return json.load(f)
 
-def create_styles(font_name='Japanese'):
+def generate_graph(daily_stats, video_title):
+    """Generate view count graph using matplotlib"""
+    if not daily_stats or len(daily_stats) == 0:
+        return None
+
+    try:
+        # Extract dates and views
+        dates = [stat['date'] for stat in daily_stats]
+        views = [stat['views'] for stat in daily_stats]
+
+        # Create figure
+        fig, ax = plt.subplots(figsize=(4, 2.5), dpi=100)
+        ax.plot(range(len(dates)), views, marker='o', linewidth=1.5, markersize=3, color='#1f77b4')
+        ax.fill_between(range(len(dates)), views, alpha=0.3, color='#1f77b4')
+
+        # Format
+        ax.set_ylabel('Views', fontsize=8)
+        ax.tick_params(axis='both', labelsize=7)
+        ax.grid(True, alpha=0.3)
+        plt.tight_layout()
+
+        # Convert to image file
+        temp_path = f"/tmp/graph_{video_title[:10]}.png"
+        plt.savefig(temp_path, format='png', dpi=100, bbox_inches='tight')
+        plt.close()
+
+        return temp_path
+    except Exception as e:
+        print(f"Error generating graph: {e}")
+        return None
+
+def create_japanese_text_image(text, width=400, height=30, fontsize=10):
+    """Create image with Japanese text using PIL"""
+    try:
+        # Create image
+        img = Image.new('RGB', (width, height), color='white')
+        draw = ImageDraw.Draw(img)
+
+        # Try to use system font
+        font_paths = [
+            "/System/Library/Fonts/Hiragino Sans W3.ttc",
+            "/Library/Fonts/Hiragino Sans W3.ttc",
+            "/System/Library/Fonts/STHeiti Medium.ttc",
+        ]
+
+        font = None
+        for font_path in font_paths:
+            if os.path.exists(font_path):
+                try:
+                    font = ImageFont.truetype(font_path, fontsize)
+                    break
+                except:
+                    continue
+
+        if font is None:
+            font = ImageFont.load_default()
+
+        # Draw text
+        draw.text((5, 5), text, fill='#333333', font=font)
+
+        return img
+    except Exception as e:
+        print(f"Error creating Japanese text image: {e}")
+        return None
+
+def create_styles():
     """Create custom styles for the PDF"""
     styles = getSampleStyleSheet()
 
-    # Determine font to use (fallback to Helvetica if Japanese font not available)
-    try:
-        pdfmetrics.getFont(font_name)
-        body_font = font_name
-        bold_font = font_name
-    except:
-        print(f"Font '{font_name}' not available, falling back to Helvetica")
-        body_font = 'Helvetica'
-        bold_font = 'Helvetica-Bold'
-
-    # Title style
     title_style = ParagraphStyle(
         'CustomTitle',
-        parent=styles['Heading1'],
-        fontSize=18,
+        fontSize=16,
         textColor='#333333',
-        spaceAfter=6,
-        alignment=TA_CENTER,
-        fontName=bold_font
+        spaceAfter=10,
+        alignment=TA_LEFT,
+        fontName='Helvetica-Bold'
     )
 
-    # Video info style
-    info_style = ParagraphStyle(
-        'VideoInfo',
-        parent=styles['Normal'],
-        fontSize=9,
-        leading=11,
-        textColor='#333333',
-        spaceAfter=3,
-        fontName=body_font
-    )
-
-    # Label style (for "再生回数" etc)
-    label_style = ParagraphStyle(
-        'Label',
-        parent=styles['Normal'],
+    small_style = ParagraphStyle(
+        'SmallText',
         fontSize=8,
         leading=9,
-        textColor='#666666',
-        spaceAfter=1,
-        fontName=bold_font
+        textColor='#333333',
+        spaceAfter=2,
+        fontName='Helvetica'
     )
 
     return {
         'title': title_style,
-        'info': info_style,
-        'label': label_style,
-        'normal': styles['Normal'],
-        'heading': styles['Heading2'],
-        'body_font': body_font
+        'small': small_style,
     }
 
 def format_number(num):
@@ -122,66 +122,104 @@ def format_number(num):
     if isinstance(num, float):
         if num == int(num):
             return f"{int(num):,}"
-        else:
-            return f"{num:,.2f}"
+        return f"{num:,.1f}"
     return f"{int(num):,}"
 
-def create_video_info_cell(video, styles):
-    """Create a formatted cell with video information"""
+def create_video_info_cell(video, styles, image_dir='reports/images'):
+    """Create cell with video information"""
     elements = []
 
-    # Video title (clickable link)
-    title = Paragraph(
-        f"<b>{video.get('Video_title', 'N/A')}</b>",
-        styles['label']
-    )
-    elements.append(title)
+    # Thumbnail
+    thumb_path = f"{image_dir}/thumbnail_{video.get('Video_id', 'N/A')}_trim.jpg"
+    if os.path.exists(thumb_path):
+        try:
+            img = RLImage(thumb_path, width=3.5*cm, height=2*cm)
+            elements.append(img)
+        except:
+            elements.append(Paragraph("No image", styles['small']))
+    else:
+        elements.append(Paragraph("No image", styles['small']))
 
-    # URL
-    url_text = f"<font size=7>{video.get('Video_id', 'N/A')}</font>"
-    elements.append(Paragraph(url_text, styles['info']))
+    elements.append(Spacer(1, 0.15*cm))
 
-    # Publish date
-    elements.append(Paragraph(f"<b>公開日:</b> {video.get('Updated_date', 'N/A')}", styles['info']))
+    # Video title
+    title = video.get('Video_title', 'N/A')[:40]
+    elements.append(Paragraph(f"<b>{title}</b>", styles['small']))
 
-    # Views
+    # Video ID, date
+    video_id = video.get('Video_id', 'N/A')
+    pub_date = video.get('Updated_date', 'N/A')
+    duration = int(video.get('Duration', 0))
+    elements.append(Paragraph(f"ID: {video_id}", styles['small']))
+    elements.append(Paragraph(f"公開: {pub_date} ({duration}日)", styles['small']))
+
+    elements.append(Spacer(1, 0.1*cm))
+
+    # Key metrics
     views = format_number(video.get('View_counts', 0))
-    elements.append(Paragraph(f"<b>再生回数:</b> {views} 回", styles['info']))
-
-    # Likes/Dislikes
     likes = format_number(video.get('Like_counts', 0))
-    dislikes = format_number(video.get('Dislike_counts', 0))
-    elements.append(Paragraph(f"<b>グッド/バッド:</b> {likes}/{dislikes}", styles['info']))
-
-    # Impressions (KEY DATA)
     impressions = format_number(video.get('Impressions', 0))
-    elements.append(Paragraph(f"<b>インプレッション数:</b> {impressions} 回", styles['info']))
-
-    # CTR (KEY DATA)
     ctr = video.get('CTR', 0)
-    elements.append(Paragraph(f"<b>クリック率:</b> {ctr:.2f}%", styles['info']))
+
+    elements.append(Paragraph(f"<b>再生:</b> {views} | <b>いいね:</b> {likes}", styles['small']))
+    elements.append(Paragraph(f"<b>インプレッション:</b> {impressions}", styles['small']))
+    elements.append(Paragraph(f"<b>クリック率:</b> {ctr:.2f}%", styles['small']))
+
+    elements.append(Spacer(1, 0.1*cm))
+
+    # Graph
+    daily_stats = video.get('daily_stats', [])
+    if daily_stats:
+        graph_path = generate_graph(daily_stats, video.get('Video_title', 'video'))
+        if graph_path and os.path.exists(graph_path):
+            try:
+                graph_img = RLImage(graph_path, width=4*cm, height=2.5*cm)
+                elements.append(graph_img)
+            except:
+                pass
+
+    elements.append(Spacer(1, 0.1*cm))
+
+    # Age/Gender
+    age = video.get('Age_percentage', {})
+    gender = video.get('Gender_percentage', {})
+    elements.append(Paragraph(
+        f"年齢: 25-34 ({age.get('AGE25_34', 0):.0f}%) 35-44 ({age.get('AGE35_44', 0):.0f}%) | "
+        f"性別: 男性 ({gender.get('MALE', 0):.0f}%)",
+        styles['small']
+    ))
+
+    # Traffic
+    traffic = video.get('Traffic_source', {})
+    elements.append(Paragraph(
+        f"流入: 登録者 ({traffic.get('SUBSCRIBER', 0):.0f}%) 関連 ({traffic.get('RELATED_VIDEO', 0):.0f}%) "
+        f"検索 ({traffic.get('YT_SEARCH', 0):.0f}%)",
+        styles['small']
+    ))
+
+    # External sites
+    ext_sites = video.get('External_sites', [])
+    if ext_sites:
+        ext_text = ", ".join([f"{list(site.keys())[0]}" for site in ext_sites[:2]])
+        elements.append(Paragraph(f"外部: {ext_text}", styles['small']))
 
     return elements
 
 def generate_pdf(json_file, pdf_file):
-    """Generate 2-column PDF from JSON data"""
+    """Generate PDF from JSON data"""
 
-    # Register Japanese fonts
-    font_registered = register_japanese_fonts()
-    font_name = 'Japanese' if font_registered else 'Helvetica'
-
-    # Load data
+    print("Loading data...")
     videos = load_json_data(json_file)
-    styles = create_styles(font_name)
+    styles = create_styles()
 
     # Create PDF
     doc = SimpleDocTemplate(
         pdf_file,
         pagesize=landscape(A4),
-        rightMargin=1*cm,
-        leftMargin=1*cm,
-        topMargin=1.5*cm,
-        bottomMargin=1*cm
+        rightMargin=0.8*cm,
+        leftMargin=0.8*cm,
+        topMargin=1*cm,
+        bottomMargin=0.8*cm
     )
 
     story = []
@@ -190,60 +228,49 @@ def generate_pdf(json_file, pdf_file):
     today = datetime.now().strftime('%Y年%m月%d日')
     title = Paragraph(f"show int レポート {today}", styles['title'])
     story.append(title)
+    story.append(Spacer(1, 0.3*cm))
 
-    subtitle = Paragraph("動画統計情報", styles['heading'])
-    story.append(subtitle)
-    story.append(Spacer(1, 0.5*cm))
-
-    # Video list (before detail)
-    video_list_text = []
+    # Video list
+    video_names = []
     for i, video in enumerate(videos, 1):
-        video_list_text.append(f"{i}. {video.get('Video_title', 'N/A')}")
+        video_names.append(f"{i}. {video.get('Video_title', 'N/A')[:35]}")
 
-    video_list_para = Paragraph(
-        "<br/>".join(video_list_text),
-        styles['info']
-    )
-    story.append(video_list_para)
+    video_list_text = " | ".join([f"{i+1}" for i in range(len(videos))])
+    video_list = Paragraph(f"動画数: {len(videos)}件", styles['small'])
+    story.append(video_list)
     story.append(PageBreak())
 
     # 2-column video details
+    col_width = 9*cm
+
+    print("Generating video cards...")
     for i in range(0, len(videos), 2):
-        row_data = []
+        left_elements = create_video_info_cell(videos[i], styles)
 
-        # Left column
-        left_video = videos[i]
-        left_elements = create_video_info_cell(left_video, styles)
-
-        # Right column
         right_elements = []
         if i + 1 < len(videos):
-            right_video = videos[i + 1]
-            right_elements = create_video_info_cell(right_video, styles)
+            right_elements = create_video_info_cell(videos[i + 1], styles)
 
-        # Create table row
-        row_data = [
-            left_elements if left_elements else [""],
-            right_elements if right_elements else [""]
-        ]
+        row_data = [left_elements, right_elements if right_elements else [""]]
 
-        table = Table(row_data, colWidths=[10*cm, 10*cm])
+        table = Table(row_data, colWidths=[col_width, col_width])
         table.setStyle(TableStyle([
             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-            ('LEFTPADDING', (0, 0), (-1, -1), 0.3*cm),
-            ('RIGHTPADDING', (0, 0), (-1, -1), 0.3*cm),
-            ('TOPPADDING', (0, 0), (-1, -1), 0.3*cm),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 0.5*cm),
-            ('BORDER', (0, 0), (-1, -1), 0.5, '#cccccc'),
-            ('BACKGROUND', (0, 0), (-1, -1), '#f9f9f9'),
+            ('LEFTPADDING', (0, 0), (-1, -1), 0.2*cm),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 0.2*cm),
+            ('TOPPADDING', (0, 0), (-1, -1), 0.2*cm),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 0.3*cm),
+            ('BORDER', (0, 0), (-1, -1), 0.5, colors.HexColor('#dddddd')),
+            ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#fafafa')),
         ]))
 
         story.append(table)
-        story.append(Spacer(1, 0.5*cm))
+        story.append(Spacer(1, 0.3*cm))
 
     # Build PDF
+    print("Building PDF...")
     doc.build(story)
-    print(f"PDF generated: {pdf_file}")
+    print(f"✓ PDF generated: {pdf_file}")
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
@@ -260,7 +287,7 @@ if __name__ == '__main__':
     try:
         generate_pdf(json_file, pdf_file)
     except Exception as e:
-        print(f"Error generating PDF: {e}")
+        print(f"Error: {e}")
         import traceback
         traceback.print_exc()
         sys.exit(1)
