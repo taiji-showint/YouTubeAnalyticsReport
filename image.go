@@ -5,8 +5,6 @@ import (
 	"image/jpeg" // JPEGを読み書きする場合
 	"os"
 	"strings"
-
-	"golang.org/x/image/draw"
 )
 
 // 画像を読み取るための関数。
@@ -42,12 +40,23 @@ func saveImage(path string, img image.Image) error {
 }
 
 func trimImage(img image.Image, top, left, width, height int) image.Image {
-	// 新しい画像を用意する
+	// クロップのみ（アスペクト比を保持）
+	// 左上(left, top)から右下(left+width, top+height)までの範囲を抽出
+	type subImageIface interface {
+		SubImage(r image.Rectangle) image.Image
+	}
+
+	if subImg, ok := img.(subImageIface); ok {
+		return subImg.SubImage(image.Rect(left, top, left+width, top+height))
+	}
+
+	// SubImage に対応していない場合は RGBA にコピー
 	newImage := image.NewRGBA(image.Rect(0, 0, width, height))
-
-	// 左上(left, top)から右下(left+width, top+height)までの範囲を、新しい画像にコピーする
-	draw.BiLinear.Scale(newImage, newImage.Bounds(), img, image.Rect(left, top, left+width, top+height), draw.Over, nil)
-
+	for y := 0; y < height && top+y < img.Bounds().Max.Y; y++ {
+		for x := 0; x < width && left+x < img.Bounds().Max.X; x++ {
+			newImage.Set(x, y, img.At(left+x, top+y))
+		}
+	}
 	return newImage
 }
 
@@ -56,7 +65,24 @@ func trim_YT_Thumbnail(filename string) error {
 	if err != nil {
 		return err
 	}
-	img_trim := trimImage(img, 45, 0, 480, 315)
+
+	// 画像サイズを取得
+	bounds := img.Bounds()
+	imgWidth := bounds.Max.X - bounds.Min.X
+
+	// アスペクト比 16:9 を保持して trim
+	// 高さから幅を計算（16:9）
+	targetHeight := 315
+	targetWidth := targetHeight * 16 / 9 // = 560
+
+	// 左右中央からトリムするために、開始位置を計算
+	startX := (imgWidth - targetWidth) / 2
+	if startX < 0 {
+		startX = 0
+	}
+	startY := 45
+
+	img_trim := trimImage(img, startY, startX, targetWidth, targetHeight)
 	filename_trim := strings.Replace(filename, ".jpg", "", -1) + "_trim.jpg"
 	err = saveImage(filename_trim, img_trim)
 	return err

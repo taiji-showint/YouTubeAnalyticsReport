@@ -8,6 +8,7 @@
 {{ end }}
 
 {{ range . }}
+|項目|内容|
 |---|---|
 |動画名|{{ .Video_title }}|
 |動画URL|https://www.youtube.com/watch?v={{ .Video_id }}|

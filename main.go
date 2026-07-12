@@ -18,8 +18,8 @@ func main() {
 	//channel_stats := getChannelStats()
 
 	startdate := "2026-02-23"
-	enddate := "2026-04-28"
-	//enddate := "2026-03-01"
+	//enddate := "2026-04-28"
+	enddate := "2026-03-10"
 	today := time.Now().Format("2006-01-02")
 
 	// Get video list and basic stats from YouTube Data API
