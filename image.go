@@ -45,8 +45,8 @@ func trimImage(img image.Image, top, left, width, height int) image.Image {
 	// 新しい画像を用意する
 	newImage := image.NewRGBA(image.Rect(0, 0, width, height))
 
-	// 左上(top, left)から右下(top+width, left+height)までの範囲を、新しい画像にコピーする
-	draw.BiLinear.Scale(newImage, newImage.Bounds(), img, image.Rect(left, top, width, height), draw.Over, nil)
+	// 左上(left, top)から右下(left+width, top+height)までの範囲を、新しい画像にコピーする
+	draw.BiLinear.Scale(newImage, newImage.Bounds(), img, image.Rect(left, top, left+width, top+height), draw.Over, nil)
 
 	return newImage
 }
