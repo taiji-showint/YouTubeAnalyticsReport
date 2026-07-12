@@ -318,7 +318,14 @@ func updateVideoTrafficSourceType(video *Video) {
 	)
 
 	for _, row := range response.Rows {
-		ratio := truncFloat( row[1].(float64) / video.View_counts * 100 )
+		// Avoid division by zero
+		var ratio float64
+		if video.View_counts > 0 {
+			ratio = truncFloat( row[1].(float64) / video.View_counts * 100 )
+		} else {
+			ratio = 0
+		}
+
 		switch row[0] {
 		case "SUBSCRIBER":
 			video.Traffic_source.SUBSCRIBER 	= ratio
@@ -342,7 +349,7 @@ func updateVideoTrafficSourceType(video *Video) {
 		}
 	}
 	//m, _ := json.MarshalIndent(video,"","    ")
-	//fmt.Println(string(m))	
+	//fmt.Println(string(m))
 }
 
 func updateVideoExternalSites(video *Video) {
@@ -365,7 +372,13 @@ func updateVideoExternalSites(video *Video) {
 	for _, row := range response.Rows {
 		site_name := row[0].(string)
 		site_count := row[1].(float64)
-		site_ratio := truncFloat( site_count / video.Traffic_source.EXT_URL_count * 100 )
+		// Avoid division by zero
+		var site_ratio float64
+		if video.Traffic_source.EXT_URL_count > 0 {
+			site_ratio = truncFloat( site_count / video.Traffic_source.EXT_URL_count * 100 )
+		} else {
+			site_ratio = 0
+		}
 		site_list := map[string]float64{ site_name : site_ratio }
 		video.External_sites = append(video.External_sites, site_list)
 	}

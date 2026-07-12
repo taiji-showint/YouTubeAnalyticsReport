@@ -19,7 +19,7 @@ func main() {
 
 	startdate := "2026-02-23"
 	//startdate := "2024-07-20"
-	enddate := "2026-07-12"
+	enddate := "2026-04-28"
 	today := time.Now().Format("2006-01-02")
 
 	// Get video list and basic stats from YouTube Data API
