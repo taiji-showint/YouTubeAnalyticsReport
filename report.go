@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"text/template"
 	"strings"
@@ -153,5 +154,15 @@ func render_report(video_list []Video, date string, yearly bool, channelStats *C
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
+	}
+
+	// Convert Markdown to PDF using Pandoc
+	pdf_filename := strings.TrimSuffix(report_filename, ".md") + ".pdf"
+	cmd := exec.Command("pandoc", "-f", "markdown", "-t", "pdf", "-o", pdf_filename, report_filename)
+	if err := cmd.Run(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error converting to PDF: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Make sure pandoc is installed: brew install pandoc\n")
+	} else {
+		fmt.Fprintf(os.Stderr, "PDF generated: %s\n", pdf_filename)
 	}
 }

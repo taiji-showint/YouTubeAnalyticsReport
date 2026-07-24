@@ -19,6 +19,7 @@ func main() {
 
 	startdate := "2026-02-23"
 	enddate := "2026-04-28"
+	//enddate := "2026-03-01"
 	today := time.Now().Format("2006-01-02")
 
 	// Get new subscribers during the period (from startdate to today)
@@ -31,7 +32,7 @@ func main() {
 
 	// Load impressions and CTR data from YouTube Studio CSV export
 	// Expected CSV path: analytics_csv/{YYYYMMDD}/表データ.csv
-	csvPath := "analytics_csv/20260712/表データ.csv"
+	csvPath := "analytics_csv/" + today + "/表データ.csv"
 	analyticsData, err := loadAnalyticsFromCSV(csvPath)
 	if err != nil {
 		log.Fatalf("Error loading analytics CSV: %v", err)
