@@ -268,65 +268,45 @@
 
 ### 期間内のコンテンツ別 視聴回数上位10位
 
-1. [学べる手段が圧倒的に少ない!? 初心者ネットワークエンジニアの独学の難しさを語る](https://www.youtube.com/watch?v=2Cn8ylwRL1U) (視聴回数: 2351 回)
+**1. [学べる手段が圧倒的に少ない!? 初心者ネットワークエンジニアの独学の難しさを語る](https://www.youtube.com/watch?v=2Cn8ylwRL1U)** (視聴回数: 2351 回)
 
-<img src="images/thumbnail_2Cn8ylwRL1U_trim.jpg" width="160" height="90">
+![thumbnail](images/thumbnail_2Cn8ylwRL1U_trim.jpg)
 
----
+**2. [新人エンジニアにオススメしたい「勉強しても損しない技術」の見極め方](https://www.youtube.com/watch?v=tZU23UkkUOk)** (視聴回数: 1479 回)
 
-2. [新人エンジニアにオススメしたい「勉強しても損しない技術」の見極め方](https://www.youtube.com/watch?v=tZU23UkkUOk) (視聴回数: 1479 回)
+![thumbnail](images/thumbnail_tZU23UkkUOk_trim.jpg)
 
-<img src="images/thumbnail_tZU23UkkUOk_trim.jpg" width="160" height="90">
+**3. [「AIによってネットワークエンジニアの仕事は本当に奪われるのか!?」現役エンジニアが真剣に議論してみた](https://www.youtube.com/watch?v=E9VL1Ot_cfw)** (視聴回数: 1247 回)
 
----
+![thumbnail](images/thumbnail_E9VL1Ot_cfw_trim.jpg)
 
-3. [「AIによってネットワークエンジニアの仕事は本当に奪われるのか!?」現役エンジニアが真剣に議論してみた](https://www.youtube.com/watch?v=E9VL1Ot_cfw) (視聴回数: 1247 回)
+**4. [市販品なのに規格外!? 国内メーカーが語る LANケーブル のトラブル事例【JANOG57プログラム解説】](https://www.youtube.com/watch?v=Df-6ElLx7V0)** (視聴回数: 814 回)
 
-<img src="images/thumbnail_E9VL1Ot_cfw_trim.jpg" width="160" height="90">
+![thumbnail](images/thumbnail_Df-6ElLx7V0_trim.jpg)
 
----
+**5. [ネットワーク業界関係者6000名が集まった「JANOG57 in 大阪」 当日の状況を現地から振り返る](https://www.youtube.com/watch?v=mby-5QCJpAU)** (視聴回数: 636 回)
 
-4. [市販品なのに規格外!? 国内メーカーが語る LANケーブル のトラブル事例【JANOG57プログラム解説】](https://www.youtube.com/watch?v=Df-6ElLx7V0) (視聴回数: 814 回)
+![thumbnail](images/thumbnail_mby-5QCJpAU_trim.jpg)
 
-<img src="images/thumbnail_Df-6ElLx7V0_trim.jpg" width="160" height="90">
+**6. [ネットワーク業界関係者 6000名が集まった JANOG57 in 大阪  に現地参加してきました 【JANOG57前編】](https://www.youtube.com/watch?v=Kgq6-xUBAD8)** (視聴回数: 623 回)
 
----
+![thumbnail](images/thumbnail_Kgq6-xUBAD8_trim.jpg)
 
-5. [ネットワーク業界関係者6000名が集まった「JANOG57 in 大阪」 当日の状況を現地から振り返る](https://www.youtube.com/watch?v=mby-5QCJpAU) (視聴回数: 636 回)
+**7. [KDDI新入社員が作った!! 遊んで学べる ネットワークボードゲームを現地レポート 【JANOG57 BoF】](https://www.youtube.com/watch?v=n20srMkJuPA)** (視聴回数: 617 回)
 
-<img src="images/thumbnail_mby-5QCJpAU_trim.jpg" width="160" height="90">
+![thumbnail](images/thumbnail_n20srMkJuPA_trim.jpg)
 
----
+**8. [現役ネットワークエンジニアが実践している「ストレスとの正しい付き合い方」](https://www.youtube.com/watch?v=rbVrhAaDtHo)** (視聴回数: 584 回)
 
-6. [ネットワーク業界関係者 6000名が集まった JANOG57 in 大阪  に現地参加してきました 【JANOG57前編】](https://www.youtube.com/watch?v=Kgq6-xUBAD8) (視聴回数: 623 回)
+![thumbnail](images/thumbnail_rbVrhAaDtHo_trim.jpg)
 
-<img src="images/thumbnail_Kgq6-xUBAD8_trim.jpg" width="160" height="90">
+**9. [JANOG57 in 大阪 に集まるネットワーク業界の企業展示ブースを散策してきました 【JANOG57後編】](https://www.youtube.com/watch?v=fLCwanCxniM)** (視聴回数: 510 回)
 
----
+![thumbnail](images/thumbnail_fLCwanCxniM_trim.jpg)
 
-7. [KDDI新入社員が作った!! 遊んで学べる ネットワークボードゲームを現地レポート 【JANOG57 BoF】](https://www.youtube.com/watch?v=n20srMkJuPA) (視聴回数: 617 回)
+**10. [トラフィックで見る 野球世界一決定戦 WBC2026](https://www.youtube.com/watch?v=SNUdTMWOuus)** (視聴回数: 497 回)
 
-<img src="images/thumbnail_n20srMkJuPA_trim.jpg" width="160" height="90">
-
----
-
-8. [現役ネットワークエンジニアが実践している「ストレスとの正しい付き合い方」](https://www.youtube.com/watch?v=rbVrhAaDtHo) (視聴回数: 584 回)
-
-<img src="images/thumbnail_rbVrhAaDtHo_trim.jpg" width="160" height="90">
-
----
-
-9. [JANOG57 in 大阪 に集まるネットワーク業界の企業展示ブースを散策してきました 【JANOG57後編】](https://www.youtube.com/watch?v=fLCwanCxniM) (視聴回数: 510 回)
-
-<img src="images/thumbnail_fLCwanCxniM_trim.jpg" width="160" height="90">
-
----
-
-10. [トラフィックで見る 野球世界一決定戦 WBC2026](https://www.youtube.com/watch?v=SNUdTMWOuus) (視聴回数: 497 回)
-
-<img src="images/thumbnail_SNUdTMWOuus_trim.jpg" width="160" height="90">
-
----
+![thumbnail](images/thumbnail_SNUdTMWOuus_trim.jpg)
 
 
 

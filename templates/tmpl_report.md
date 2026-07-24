@@ -62,11 +62,9 @@
 ### 期間内のコンテンツ別 視聴回数上位10位
 
 {{ range $idx, $video := (index . 0).TopTenVideos -}}
-{{ add $idx 1 }}. [{{ $video.Video_title }}](https://www.youtube.com/watch?v={{ $video.Video_id }}) (視聴回数: {{ printf "%.0f" $video.View_counts }} 回)
+**{{ add $idx 1 }}. [{{ $video.Video_title }}](https://www.youtube.com/watch?v={{ $video.Video_id }})** (視聴回数: {{ printf "%.0f" $video.View_counts }} 回)
 
-<img src="images/thumbnail_{{ $video.Video_id }}_trim.jpg" width="160" height="90">
-
----
+![thumbnail](images/thumbnail_{{ $video.Video_id }}_trim.jpg)
 
 {{ end }}
 
