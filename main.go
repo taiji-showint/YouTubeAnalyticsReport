@@ -17,8 +17,8 @@ func main() {
 	channel_stats := getChannelStats()
 	fmt.Printf("Channel Stats: Title=%s, Subscribers=%s\n", channel_stats.Channel_title, channel_stats.Subscribers)
 
-	startdate := "2026-02-23"
-	enddate := "2026-04-28"
+	startdate := "2026-05-04"
+	enddate := "2026-07-06"
 	//enddate := "2026-03-01"
 	today := time.Now().Format("2006-01-02")
 
